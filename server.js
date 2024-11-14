@@ -1,6 +1,9 @@
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
 }
+
+
+const PORT = 3000
 const mongoose = require('mongoose')
 const express = require('express')
 const app = express()
@@ -9,10 +12,12 @@ const passport = require('passport')
 const flash = require('express-flash')
 const session = require('express-session')
 const initPassport = require('./passport')
+
+
 initPassport(
     passport, 
-    email => users.find(user => user.email === email),
-    id => users.find(user => user.id === id)
+    email => User.findOne({email}),
+    id => User.findById(id)
 )
 
 
@@ -28,8 +33,7 @@ app.use(session(
     }
 ))
 
-mongoose.connect(url, {
-    useNewUrlParse: true,
+mongoose.connect(process.env.url, {
     useUnifiedTopology: true
 })
 .then(() => console.log('Database Connected...'))
@@ -85,6 +89,8 @@ app.post('/register', checkNotAuth, async (req, res) => {
 
     const {name, email, password} = req.body;
 
+
+
     try {
         const existingUser = await User.findOne({ email });
         if(existingUser) {
@@ -126,5 +132,7 @@ function checkNotAuth(req,res, next){
 
 
 
-app.listen(3000)
+app.listen(PORT, () => {
+    console.log(`BIG TONKA SERVER LIVE! http://localhost:${PORT}`)
+})
 
