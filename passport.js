@@ -1,3 +1,5 @@
+
+const bcrypt = require('bcrypt');
 const { authenticate } = require('passport')
 
 const LocalStrategy = require('passport-local').Strategy
