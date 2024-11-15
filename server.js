@@ -3,7 +3,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 
-const PORT = 3000
+const PORT = 9999
 const mongoose = require('mongoose')
 const express = require('express')
 const app = express()
@@ -41,7 +41,7 @@ mongoose.connect(process.env.url, {
 
 
 
-// model
+// model and Schemas
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -58,18 +58,66 @@ const userSchema = new mongoose.Schema({
     }
 }) 
 
-const User = mongoose.model('User', userSchema)
-module.exports = User;
+const expenseSchema = new mongoose.Schema({
+    
+    description: {
+        type: String,
+        required: true,
+        required: true,
+    },
+    amount: {
+        type: Number,
+        required: true
+    },
+    category: {
+        type: String,
+        require: true
+    }, 
+    date: {
+        type: Date,
+        default: Date.now()
+    },
 
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }
+})
+
+const Expense = mongoose.model('Expense', expenseSchema)
+
+
+const User = mongoose.model('User', userSchema)
+
+module.exports = {User, exports}
+
+// Auth
 
 app.use(passport.initialize())
 app.use(passport.session())
 
 
+// login routes
 
-app.get('/', checkAuth, (req,res) => {
-    res.render('index.ejs', {name: req.user.name})
+app.get('/', checkAuth, async (req,res) => {
+    try {
+        const recentExpenses = await Expense.find({userId: req.user._id})
+        .sort( {date: -1})
+        .limit(5)
+
+        res.render('index.ejs', {
+            name: req.user.name,
+            recentExpenses
+        })
+    }catch (err) {
+        console.error('Error displaying expenses:', err)
+        res.status(500).send('Error fetching expenses');
+    }
 })
+
+
+
 
 app.get('/login', checkNotAuth, (req, res) => {
     res.render('login.ejs')
@@ -85,40 +133,38 @@ app.get('/register', checkNotAuth, (req, res) => {
     res.render('register.ejs')
 })
 
+
+
 app.post('/register', checkNotAuth, async (req, res) => {
-
+    
     const {name, email, password} = req.body;
-
-
-
     try {
         const existingUser = await User.findOne({ email });
         if(existingUser) {
             return res.redirect('/login')
         }
-
+        
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
-
+        
         const newUser = new User ({
             name,
             email,
             password: hashedPassword
         });
-
+        
         await newUser.save()
-
+        
         res.redirect('/login');
     } catch (err) {
-        console.error(error);
-        res.redirect('/register')
+        console.error(error)
     }
 })
 
 function checkAuth(req,res, next){
     if(req.isAuthenticated()){
-         return next()
+        return next()
     }
-
+    
     res.redirect('/login')
 }
 
@@ -129,6 +175,44 @@ function checkNotAuth(req,res, next){
     
     next()
 }
+
+//Expense Routes
+
+//  render form to add new expenses
+
+app.get('/expenses/new', checkAuth, async (req,res) => {
+    res.render('expenses/new.ejs' )
+})
+
+
+// saving expenses to the DB
+app.post('/expenses', checkAuth, async (req, res) => {
+    const {description, amount, category} = req.body
+    
+    
+    // making expense object form the Expense model
+    const newExpense = new Expense({
+        description,
+        amount,
+        category,
+        userId: req.user._id
+    });
+
+    // adding form data to mongoDB
+    try {
+        await newExpense.save();
+        res.redirect('/')
+    } catch (err) {
+        console.error(err);
+        res.redirect('/expenses/new')
+    }
+
+})
+
+
+
+
+
 
 
 

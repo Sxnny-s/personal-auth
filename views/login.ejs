@@ -3,27 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Login</title>
 </head>
-<body>
-    <h1>Login</h1>
-    <% if (messages.error) { %>
-        <%= messages.error %>
+<body class="bg-gray-100 h-screen flex justify-center items-center"> <!-- Full height and centered layout -->
+
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full"> <!-- White form container with padding and shadow -->
+        <h1 class="text-2xl font-semibold text-center mb-4">Login</h1> <!-- Page title, centered, and bold -->
+
+        <% if (messages.error) { %>
+            <div class="text-red-500 text-center mb-4"> <!-- If error exists, show in red -->
+                <%= messages.error %>
+            </div>
         <% } %>
 
-    <form action="/login" method="POST">
-        <div>
-            <label for="name">Email</label>
-            <input type="email" id="email" name="email" required>
-        </div>
+        <!-- Login Form -->
+        <form action="/login" method="POST">
+            <div class="mb-4"> <!-- Margin bottom for the first field -->
+                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="email" name="email" required 
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                <!-- Email input with padding, border, and focus state -->
+            </div>
 
-        <div>
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
+            <div class="mb-6"> <!-- Margin bottom for password field -->
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" id="password" name="password" required 
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                <!-- Password input with similar styling -->
+            </div>
+
+            <button type="submit" class="w-full py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600">
+                Login
+            </button> <!-- Submit button with color and hover effect -->
+        </form>
+
+        <!-- Register link -->
+        <div class="mt-4 text-center">
+            <a href="/register" class="text-blue-500 hover:text-blue-700 text-sm">Don't have an account? Register</a>
         </div>
-        <button type="submit">Login</button>
-    </form>
-     <a href="/register">Register</a>
-    
+    </div>
+
 </body>
 </html>

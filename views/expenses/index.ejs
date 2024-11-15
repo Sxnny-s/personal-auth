@@ -1,17 +1,17 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Your Expenses</title>
 </head>
 <body>
-    <h1>Welcome to your Dashboard, <%= name %> </h1>
-
-    <h3>Your Recent Expenses</h3>
+    <h1>Your Expenses</h1>
+    
     <ul>
-        <% recentExpenses.forEach(expense => { %>
+        <% expenses.forEach(expense => { %>
             <li>
                 <strong><%= expense.description %></strong><br>
                 Amount: $<%= expense.amount %><br>
@@ -21,8 +21,6 @@
         <% }) %>
     </ul>
 
-    <a href="/expenses/new">Add New Expense</a> 
-    <br>
-    <a href="/logout">Logout</a> 
+    <a href="/expenses/new">Add New Expense</a> <!-- Link to the form for new expenses -->
 </body>
 </html>
